@@ -10,18 +10,30 @@ from bs4 import BeautifulSoup
 options = webdriver.FirefoxOptions()
 options.add_argument("--kiosk")
 
-driver = webdriver.Firefox(executable_path='/usr/bin/geckodriver', firefox_options=options, proxy='163.172.89.109:1366')
-# driver.maximize_window()
+profile = webdriver.FirefoxProfile()
+profile.set_preference('intl.accept_languages', 'en-US, en, ja')
+profile.update_preferences()
+
+proxy_use = '163.172.89.109:1463'
+desired_capability = webdriver.DesiredCapabilities.FIREFOX
+desired_capability['proxy'] = {
+    'proxyType': "manual",
+    'httpProxy': proxy_use,
+    'ftpProxy': proxy_use,
+    'sslProxy': proxy_use,
+}
+
+driver = webdriver.Firefox(executable_path='C:\BOT\geckodriver.exe', firefox_options=options, firefox_profile=profile,
+                           capabilities=desired_capability)
 
 
 class SeleniumBot(object):
-
     def __init__(self):
         self.post_qandas()
 
     def post_qandas(self):
         url = 'https://www.quora.com/'
-        # r = self.make_request(url)
+
         driver.get(url)
 
         qa_response = requests.get('https://beta.matrixcore.io/api/panel/seo/qandas/?is_active=1',
@@ -40,11 +52,11 @@ class SeleniumBot(object):
 
         email_entry = WebDriverWait(driver, 20).until(EC.element_to_be_clickable(
             (By.XPATH, "//div[@class='form_inputs']/div[@class='form_column'][1]/input")))
-        email_entry.send_keys("---------------")
+        email_entry.send_keys("************")
 
         password_entry = WebDriverWait(driver, 20).until(EC.element_to_be_clickable(
             (By.XPATH, "//div[@class='form_inputs']/div[@class='form_column'][2]/input")))
-        password_entry.send_keys("----------------")
+        password_entry.send_keys("************")
 
         login_btn = WebDriverWait(driver, 20).until(EC.element_to_be_clickable(
             (By.XPATH, "//div[@class='form_inputs']/div[@class='form_column'][3]/input[@value='Login']")))

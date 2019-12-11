@@ -1,3 +1,5 @@
 *.pyc
 .idea/
 .git/
+__pycache__/
+*.log

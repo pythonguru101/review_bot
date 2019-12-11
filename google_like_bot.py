@@ -1,18 +1,19 @@
 import time
 import requests
-import pandas as pd
-
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
-from selenium.common.exceptions import NoSuchElementException
 from bs4 import BeautifulSoup
+import pandas as pd
 from urllib.request import urlopen
-from selenium.webdriver.common.proxy import ProxyType
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import NoSuchElementException
+import time
 
-data = pd.read_csv('list.csv')
+data = pd.read_csv('like.csv')
 
 for d in data.values:
     print("********", d)
@@ -21,7 +22,7 @@ for d in data.values:
     profile.set_preference('intl.accept_languages', 'en-US, en, ja')
     profile.update_preferences()
 
-    proxy_use = d[7]
+    proxy_use = d[8]
     desired_capability = webdriver.DesiredCapabilities.FIREFOX
     desired_capability['proxy'] = {
         'proxyType': "manual",
@@ -34,25 +35,18 @@ for d in data.values:
                                capabilities=desired_capability)
     driver.get("https://accounts.google.com/signin")
 
-    time.sleep(5)
-    try:
-        another_account_btn = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
-            (By.XPATH, "//div[contains(text(), 'Use another account')]")))
-        driver.execute_script("arguments[0].click();", another_account_btn)
-    except TimeoutException:
-        print("No element found")
-
-    time.sleep(5)
+    driver.implicitly_wait(3)
     driver.find_element_by_id("identifierId").send_keys(d[0])
     driver.find_element_by_id("identifierNext").click()
 
-    driver.implicitly_wait(5)
-    password = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, "//input[@type='password']")))
+    driver.implicitly_wait(10)
+    password = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//input[@type='password']")))
     password.send_keys(d[1])
 
     next_btn = driver.find_element_by_id('passwordNext')
     driver.execute_script("arguments[0].click();", next_btn)
 
+    # Google captcha
     # time.sleep(5)
     # image = driver.find_element_by_id('captchaimg').get_attribute("src")
     # print("Image url: ", image)
@@ -80,6 +74,7 @@ for d in data.values:
     # print("=========password, captchar==========", d[1], job.get_captcha_text())
     # next_btn = driver.find_element_by_id('passwordNext')
     # driver.execute_script("arguments[0].click();", next_btn)
+    # -----------------------------
 
     time.sleep(5)
     try:
@@ -93,7 +88,7 @@ for d in data.values:
     try:
         recover_email_entry = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
             (By.XPATH, "//input[@id='knowledge-preregistered-email-response']")))
-        recover_email_entry.send_keys(d[6])
+        recover_email_entry.send_keys(d[2])
         next_btn2 = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
             (By.XPATH, "//span[contains(text(), 'Next')]")))
         driver.execute_script("arguments[0].click();", next_btn2)
@@ -101,67 +96,69 @@ for d in data.values:
         print("No recovery email entry found")
 
     time.sleep(5)
-    try:
-        get_verification_code_btn = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
-            (By.XPATH, "//input[@value='Get code']")))
-        if get_verification_code_btn:
-            driver.quit()
-            continue
-    except TimeoutException:
-        print("No verification code")
-
-    # input GMB
-    time.sleep(5)
-    driver.get(d[2])
+    driver.get("https://www.google.com/webhp")
 
     # fake location
-    fake_lat = str(d[4])
-    fake_long = str(d[5])
+    fake_lat = str(d[6])
+    fake_long = str(d[7])
 
     # Requesting to draw a new map with desired coordinates, and puting the marker
     driver.execute_script("window.navigator.geolocation.getCurrentPosition=function(success){" +
-                            "var position = {\"coords\" : {\"latitude\": \""+fake_lat+"\",\"longitude\": \""+fake_long+"\"}};" +
-                            "success(position);}")
+                          "var position = {\"coords\" : {\"latitude\": \"" + fake_lat + "\",\"longitude\": \"" + fake_long + "\"}};" +
+                          "success(position);}")
 
-    time.sleep(10)
+    time.sleep(5)
+    google_search_entry = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
+            (By.XPATH, "//input[@title='Search']")))
+    google_search_entry.send_keys(d[3], Keys.ENTER)
+
+    SCROLL_PAUSE_TIME = 4
+    while True:
+        last_height = driver.execute_script("return document.body.scrollHeight/4;")
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight/4);")
+        time.sleep(SCROLL_PAUSE_TIME)
+        new_height = driver.execute_script("return document.body.scrollHeight/4;")
+        if new_height == last_height:
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight/4);")
+            time.sleep(SCROLL_PAUSE_TIME)
+            new_height = driver.execute_script("return document.body.scrollHeight/4;")
+            if new_height == last_height:
+                break
+            else:
+                last_height = new_height
+                continue
+
     try:
-        detail_btn = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
-                        (By.XPATH, "//a[@id='wrl']")))
-        driver.execute_script("arguments[0].click();", detail_btn)
+        time.sleep(5)
+        more_about_btn = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
+                (By.XPATH, "//div[contains(text(), 'More about')]")))
+        driver.execute_script("arguments[0].click();", more_about_btn)
     except TimeoutException:
-        print("No add/edit review button found")
+        print("No more about button found")
 
-    time.sleep(5)
-    driver.refresh()
-
-    time.sleep(5)
     try:
-        driver.switch_to.frame("goog-reviews-write-widget")
-    except NoSuchElementException:
-        print("No review write widget found")
-
-    time.sleep(5)
-    try:
-        five_star_btn = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
-                         (By.XPATH, "//span[@class='rating']/span[5]")))
-        driver.execute_script("arguments[0].click();", five_star_btn)
+        time.sleep(5)
+        ask_question_btn = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
+                (By.XPATH, "//span[contains(text(), 'See all questions')]")))
+        driver.execute_script("arguments[0].click();", ask_question_btn)
     except TimeoutException:
-        print("No star button found")
+        print("No see all questions button found")
 
     time.sleep(5)
-    try:
-        text_area = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
-                         (By.XPATH, "//div[@class='review-text-indent']/textarea")))
-        test_review = d[3]
-        text_area.send_keys(test_review)
-    except TimeoutException:
-        print("No textarea found")
+    t_end = time.time() + 30
+    while time.time() < t_end:
+        element = driver.find_elements_by_xpath("//div[@class='rbheYb']")[-1]
+        element.click()
 
-    time.sleep(5)
-    try:
-        driver.find_element_by_xpath("//div[@class='action-publish']").click()
-    except NoSuchElementException:
-        print("No publish button found")
+    elements = driver.find_elements_by_xpath("//div[@class='rbheYb']")
+    print("**********", len(elements), d[4])
+
+    for i in range(len(elements)):
+        time.sleep(2)
+        if d[4] in elements[i].text:
+            elements[i].find_element_by_xpath('./div[1]/div/div[1]/div/button[1]').click()
+            elements[i].find_element_by_xpath('./div[2]/div/div[2]/div[4]/button[1]').click()
+            break
 
     time.sleep(5)
     driver.quit()

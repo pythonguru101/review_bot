@@ -9,10 +9,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoSuchElementException
 from bs4 import BeautifulSoup
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 from urllib.request import urlopen
-from selenium.webdriver.common.proxy import ProxyType
 
-data = pd.read_csv('list.csv')
+data = pd.read_csv('reset.csv')
 
 for d in data.values:
     print("********", d)
@@ -21,7 +22,7 @@ for d in data.values:
     profile.set_preference('intl.accept_languages', 'en-US, en, ja')
     profile.update_preferences()
 
-    proxy_use = d[7]
+    proxy_use = d[6]
     desired_capability = webdriver.DesiredCapabilities.FIREFOX
     desired_capability['proxy'] = {
         'proxyType': "manual",
@@ -33,6 +34,7 @@ for d in data.values:
     driver = webdriver.Firefox(executable_path="C:\BOT\geckodriver.exe", firefox_profile=profile,
                                capabilities=desired_capability)
     driver.get("https://accounts.google.com/signin")
+    driver.implicitly_wait(5)
 
     time.sleep(5)
     try:
@@ -56,14 +58,14 @@ for d in data.values:
     # time.sleep(5)
     # image = driver.find_element_by_id('captchaimg').get_attribute("src")
     # print("Image url: ", image)
-    #
-    # # get the image source
+
+    # get the image source
     # time.sleep(5)
     # f = open("./img/captcha.jpeg", 'wb')
     # f.write(urlopen(image).read())
     # f.close()
-    #
-    # # scrape captcha string
+
+    # scrape captcha string
     # from python_anticaptcha import AnticaptchaClient, ImageToTextTask
     # api_key = 'f12634370974461a767a103936917e6c'
     # captcha_fp = open("./img/captcha.jpeg", 'rb')
@@ -93,7 +95,7 @@ for d in data.values:
     try:
         recover_email_entry = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
             (By.XPATH, "//input[@id='knowledge-preregistered-email-response']")))
-        recover_email_entry.send_keys(d[6])
+        recover_email_entry.send_keys(d[2])
         next_btn2 = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
             (By.XPATH, "//span[contains(text(), 'Next')]")))
         driver.execute_script("arguments[0].click();", next_btn2)
@@ -112,7 +114,7 @@ for d in data.values:
 
     # input GMB
     time.sleep(5)
-    driver.get(d[2])
+    driver.get("https://support.google.com/accounts/answer/41078?co=GENIE.Platform%3DDesktop&hl=en")
 
     # fake location
     fake_lat = str(d[4])
@@ -123,45 +125,27 @@ for d in data.values:
                             "var position = {\"coords\" : {\"latitude\": \""+fake_lat+"\",\"longitude\": \""+fake_long+"\"}};" +
                             "success(position);}")
 
-    time.sleep(10)
-    try:
-        detail_btn = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
-                        (By.XPATH, "//a[@id='wrl']")))
-        driver.execute_script("arguments[0].click();", detail_btn)
-    except TimeoutException:
-        print("No add/edit review button found")
+    time.sleep(5)
+    change_password_btn = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
+        (By.XPATH, "//a[contains(text(), 'Change password')]")))
+    driver.execute_script("arguments[0].click();", change_password_btn)
 
     time.sleep(5)
-    driver.refresh()
+    main_window = driver.window_handles
+    driver.switch_to.window(main_window[-1])
 
     time.sleep(5)
-    try:
-        driver.switch_to.frame("goog-reviews-write-widget")
-    except NoSuchElementException:
-        print("No review write widget found")
+    confirm_password_entry = driver.find_element_by_name("password").send_keys(d[1])
+    next_btn = driver.find_element_by_xpath("//span[contains(text(), 'Next')]")
+    driver.execute_script("arguments[0].click();", next_btn)
 
     time.sleep(5)
-    try:
-        five_star_btn = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
-                         (By.XPATH, "//span[@class='rating']/span[5]")))
-        driver.execute_script("arguments[0].click();", five_star_btn)
-    except TimeoutException:
-        print("No star button found")
-
-    time.sleep(5)
-    try:
-        text_area = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
-                         (By.XPATH, "//div[@class='review-text-indent']/textarea")))
-        test_review = d[3]
-        text_area.send_keys(test_review)
-    except TimeoutException:
-        print("No textarea found")
-
-    time.sleep(5)
-    try:
-        driver.find_element_by_xpath("//div[@class='action-publish']").click()
-    except NoSuchElementException:
-        print("No publish button found")
+    new_password_entry = driver.find_element_by_name("password").send_keys(d[3])
+    confirmation_password_entry = driver.find_element_by_name("confirmation_password").send_keys(d[3])
+    change_password_btn = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
+        (By.XPATH, "//span[contains(text(), 'Change password')]")))
+    time.sleep(3)
+    driver.execute_script("arguments[0].click();", change_password_btn)
 
     time.sleep(5)
     driver.quit()
