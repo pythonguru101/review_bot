@@ -47,33 +47,33 @@ for d in data.values:
     driver.execute_script("arguments[0].click();", next_btn)
 
     # Google captcha
-    time.sleep(5)
-    image = driver.find_element_by_id('captchaimg').get_attribute("src")
-    print("Image url: ", image)
+    #time.sleep(5)
+    #image = driver.find_element_by_id('captchaimg').get_attribute("src")
+    #print("Image url: ", image)
 
     # get the image source
-    time.sleep(5)
-    f = open("./img/captcha.jpeg", 'wb')
-    f.write(urlopen(image).read())
-    f.close()
+    #time.sleep(5)
+    #f = open("./img/captcha.jpeg", 'wb')
+    #f.write(urlopen(image).read())
+    #f.close()
 
     # scrape captcha string
-    from python_anticaptcha import AnticaptchaClient, ImageToTextTask
-    api_key = 'f12634370974461a767a103936917e6c'
-    captcha_fp = open("./img/captcha.jpeg", 'rb')
-    client = AnticaptchaClient(api_key)
-    task = ImageToTextTask(captcha_fp)
-    job = client.createTask(task)
-    job.join()
-    print("Captchar string: ", job.get_captcha_text())
+    #from python_anticaptcha import AnticaptchaClient, ImageToTextTask
+    #api_key = 'f12634370974461a767a103936917e6c'
+    #captcha_fp = open("./img/captcha.jpeg", 'rb')
+    #client = AnticaptchaClient(api_key)
+    #task = ImageToTextTask(captcha_fp)
+    #job = client.createTask(task)
+    #job.join()
+    #print("Captchar string: ", job.get_captcha_text())
 
     # input security password and captcha
-    time.sleep(5)
-    password_entry = driver.find_element_by_name("password").send_keys(d[1])
-    captchar_entry = driver.find_element_by_id("ca").send_keys(job.get_captcha_text())
-    print("=========password, captchar==========", d[1], job.get_captcha_text())
-    next_btn = driver.find_element_by_id('passwordNext')
-    driver.execute_script("arguments[0].click();", next_btn)
+    #time.sleep(5)
+    #password_entry = driver.find_element_by_name("password").send_keys(d[1])
+    #captchar_entry = driver.find_element_by_id("ca").send_keys(job.get_captcha_text())
+    #print("=========password, captchar==========", d[1], job.get_captcha_text())
+    #next_btn = driver.find_element_by_id('passwordNext')
+    #driver.execute_script("arguments[0].click();", next_btn)
     # -----------------------------
 
     time.sleep(5)
