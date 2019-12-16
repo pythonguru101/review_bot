@@ -31,7 +31,7 @@ for d in data.values:
     #     'sslProxy': proxy_use,
     # }
 
-    driver = webdriver.Firefox(firefox_profile=profile)
+    driver = webdriver.Firefox(executable_path="C:\BOT\geckodriver.exe", firefox_profile=profile)
     driver.get("https://accounts.google.com/signin")
 
     driver.implicitly_wait(3)
