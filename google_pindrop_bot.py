@@ -20,6 +20,7 @@ for d in data.values:
 
     profile = webdriver.FirefoxProfile()
     profile.set_preference('intl.accept_languages', 'en-US, en, ja')
+    profile.set_preference("general.useragent.override", "Mozilla/5.0 (Windows NT 4.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36")
     profile.update_preferences()
 
     # proxy_use = '163.172.89.109:1468'
