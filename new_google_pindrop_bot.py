@@ -210,12 +210,16 @@ for d in data.values:
     posted_list = driver.find_elements_by_xpath(post_xpath_str)
     status = posted_list[1].find_element_by_xpath('./ancestor::div').text
 
-    # while 1:
-    #     if 'PENDING' in str(status):
-    #         time.sleep(30)
-    #         driver.refresh()
-    #     else:
-    #         break
+    oldtime = time.time()
+    while True:
+        if 'PENDING' in str(status):
+            if time.time() - oldtime > 900:
+                break
+            else:
+                time.sleep(30)
+                driver.refresh()
+        else:
+            break
 
     if 'APPROVED' in str(status):
         print("The post is approved")
@@ -389,7 +393,7 @@ for d in data.values:
         edits_btn = driver.find_element_by_xpath("//button[@data-tooltip='Edits']")
         driver.execute_script("arguments[0].click();", edits_btn)
 
-    if 'NOT APPLIED' in str(status) or 'PENDING' in str(status):
+    else:
         print("The post is not approved")
         error_line = ''
         error_line = error_line + d[0] + ', ' + d[1] + ', ' + d[2] + ', ' + d[3] + ', ' + d[4] + ', ' + d[5] + ', ' + d[6] + ', ' + d[7] + ', ' + 'NOT APPLIED' + '\n'
