@@ -1,2 +1,2 @@
 # Selenium Web Bot
-This is for a test
+This is the automation tool for web scraping
