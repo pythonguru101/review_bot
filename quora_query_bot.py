@@ -4,8 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
-from bs4 import BeautifulSoup
+from security import safe_requests
 
 options = webdriver.FirefoxOptions()
 options.add_argument("--kiosk")
@@ -103,7 +102,7 @@ class SeleniumBot(object):
         headers = {
             "User-Agent": 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36.'
         }
-        r = requests.get(url, headers=headers)
+        r = safe_requests.get(url, headers=headers)
 
         if r.status_code == 200:
             return r
