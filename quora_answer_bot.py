@@ -37,13 +37,13 @@ class AnswerBot(object):
 
         qa_response = requests.get('https://beta.matrixcore.io/api/panel/seo/qandas/?is_active=1',
                                 headers={'accept': 'application/json',
-                                         'Authorization': 'Token 4d69c9b7046b12ea7848b8c47be7df4fc2914a30'})
+                                         'Authorization': 'Token 4d69c9b7046b12ea7848b8c47be7df4fc2914a30'}, timeout=60)
         qa_data = qa_response.json()
         qa_results = qa_data['results']
 
         user_response = requests.get('https://beta.matrixcore.io/api/panel/seo/accounts/?is_active=1&provider=quora',
                                 headers={'accept': 'application/json',
-                                         'Authorization': 'Token 4d69c9b7046b12ea7848b8c47be7df4fc2914a30'})
+                                         'Authorization': 'Token 4d69c9b7046b12ea7848b8c47be7df4fc2914a30'}, timeout=60)
         user_data = user_response.json()
         user_results = user_data['results']
 
@@ -101,7 +101,7 @@ class AnswerBot(object):
         headers = {
             "User-Agent": 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36.'
         }
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, timeout=60)
 
         if r.status_code == 200:
             return r
