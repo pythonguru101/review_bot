@@ -1,11 +1,11 @@
 import time
-import requests
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from bs4 import BeautifulSoup
+from security import safe_requests
 
 options = webdriver.FirefoxOptions()
 options.add_argument("--kiosk")
@@ -35,13 +35,13 @@ class AnswerBot(object):
         url = 'https://www.quora.com/'
         driver.get(url)
 
-        qa_response = requests.get('https://beta.matrixcore.io/api/panel/seo/qandas/?is_active=1',
+        qa_response = safe_requests.get('https://beta.matrixcore.io/api/panel/seo/qandas/?is_active=1',
                                 headers={'accept': 'application/json',
                                          'Authorization': 'Token 4d69c9b7046b12ea7848b8c47be7df4fc2914a30'})
         qa_data = qa_response.json()
         qa_results = qa_data['results']
 
-        user_response = requests.get('https://beta.matrixcore.io/api/panel/seo/accounts/?is_active=1&provider=quora',
+        user_response = safe_requests.get('https://beta.matrixcore.io/api/panel/seo/accounts/?is_active=1&provider=quora',
                                 headers={'accept': 'application/json',
                                          'Authorization': 'Token 4d69c9b7046b12ea7848b8c47be7df4fc2914a30'})
         user_data = user_response.json()
@@ -101,7 +101,7 @@ class AnswerBot(object):
         headers = {
             "User-Agent": 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36.'
         }
-        r = requests.get(url, headers=headers)
+        r = safe_requests.get(url, headers=headers)
 
         if r.status_code == 200:
             return r
