@@ -1,5 +1,5 @@
-import random
 import re
+import secrets
 
 mobile_agent_list = [
     # iphone firefox agent
@@ -80,5 +80,5 @@ mobile_agent_list = [
 
 
 def get_random_agent():
-    return random.choice(mobile_agent_list)
+    return secrets.choice(mobile_agent_list)
 
